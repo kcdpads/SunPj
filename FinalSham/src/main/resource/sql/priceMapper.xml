@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="price">
+<select id="selectpriceList" resultType="finalWeb.command.PriceCommand">
+		SELECT priceNo
+			 , priceGender
+			 , priceType
+			 , priceName
+			 , price
+			 FROM price
+	</select>
+	
+	<insert id="insertprice" parameterType="finalWeb.command.PriceCommand">
+		insert into price(priceNo,priceGender,priceType,priceName,price)
+		values(priceseq.NEXTVAL,#{priceGender},#{priceType},#{priceName},#{price})
+	</insert>
+	
+	<update id="update" parameterType="finalWeb.command.PriceCommand">
+	update notice set priceType = #{priceType},priceGender = #{priceGender} , priceName = #{priceName} , price = #{price} where priceNo = #{priceNo}
+	</update>
+	
+	<delete id="delete" parameterType="finalWeb.command.PriceCommand">
+		delete from price where priceNo=#{priceNo} 
+	</delete>
+	
+</mapper>

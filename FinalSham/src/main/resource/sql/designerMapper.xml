@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="designer">
+
+	<select id="selectDesignerList" resultType="finalWeb.command.DesignerCommand">
+		select
+		designer,designerPhoto,spec,favorite,position,designerNo
+		from designer
+		ORDER BY DESIGNERNO
+	</select>
+
+	<select id="selectDesigner" resultType="finalWeb.command.DesignerCommand"  parameterType="finalWeb.command.DesignerCommand">
+		select
+		designer,designerPhoto,spec,favorite,position,designerNo
+		from designer
+		where designerNo=#{designerNo}
+	</select>
+	<insert id="insertDesigner" parameterType="finalWeb.command.DesignerCommand">
+		insert into designer
+		values (#{designer},#{designerPhoto},#{spec},#{favorite},#{position},
+		DESIGNERSEQ.NEXTVAL)
+	</insert>
+
+	<delete id="deleteDesignerAll">
+		delete from designer
+	</delete>
+
+	<insert id="insertDesignerAll" parameterType="finalWeb.command.DesignerCommand">
+		insert into
+		designer
+		values
+		(#{designer},#{designerPhoto},#{spec},#{favorite},#{position},#{designerNo})
+	</insert>
+
+	<update id="updateDesigner" parameterType="finalWeb.command.DesignerCommand">
+		UPDATE designer
+		SET designer=#{designer}, designerPhoto=#{designerPhoto}, spec=#{spec}, favorite=#{favorite}, position=#{position}, designerNo=#{designerNo}
+	</update>
+</mapper>

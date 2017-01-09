@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="performReview">
+	
+	<select id="getArticleCount" resultType="int">
+	 select count(*) from performReview
+	</select>
+	
+	<select id="getArticles" resultType="finalWeb.command.ProcedureQACommand" parameterType="Map" >	
+            select pdqNo,writer,pdqTitle,passwd,pdqDate,ref,re_step,re_level,pdqContent,pdqHits,styleName,r   
+            from (select pdqNo,writer,pdqTitle,passwd,pdqDate,ref,re_step,re_level,pdqContent pdqContent,pdqHits pdqHits,styleName,rownum r  
+            from (select * from performReview order by ref desc, re_step asc) order by ref desc, re_step asc ) where r &gt;= #{startRow} and r &lt;= #{endRow}
+	</select>
+	
+	<select id="searchgetArticleCount" resultType="int" parameterType="String">
+	 select count(*) from performReview <where>
+	 <if test="searchN == 0">
+		writer 
+	 </if>	
+	  <if test="searchN == 1">
+		pdqTitle 
+	 </if>
+	  <if test="searchN == 2">
+		pdqContent 
+	 </if> 
+		 like '%' || #{searchKeyword} || '%'
+	 </where>
+	 	
+	</select>
+	
+	<select id="searchgetArticles" resultType="finalWeb.command.ProcedureQACommand" parameterType="Map" >
+
+	select
+	pdqNo,writer,pdqTitle,passwd,pdqDate,ref,re_step,re_level,pdqContent pdqContent,pdqHits pdqHits,styleName,r
+	from (select
+	pdqNo,writer,pdqTitle,passwd,pdqDate,ref,re_step,re_level,pdqContent pdqContent,pdqHits pdqHits,styleName,rownum r
+	from (select * from performReview order by ref desc, re_step asc) 
+	<where> <if test="searchN == 0">
+		writer 
+	 </if>	
+	  <if test="searchN == 1">
+		pdqTitle 
+	 </if>
+	  <if test="searchN == 2">
+		pdqContent 
+	 </if> 
+	</where>
+	like '%' || #{searchKeyword} || '%'
+	order by ref desc, re_step asc ) where r &gt;= #{startRow} and r &lt;= #{endRow}
+	
+	</select>
+	
+	
+	<select id="getArticle" resultType="finalWeb.command.ProcedureQACommand" parameterType="int" >
+	select * from performReview where pdqNo = #{pdqNo}
+	</select>
+	
+	
+	<insert id="insert" parameterType="finalWeb.command.ProcedureQACommand">
+		insert into performReview(pdqNo,writer,pdqTitle,passwd,pdqDate,ref,re_step,re_level,pdqContent,styleName)
+		values(pdqseq.NEXTVAL,#{writer},#{pdqTitle},#{passwd},sysdate,#{ref},#{re_step},#{re_level},#{pdqContent},#{styleName})
+	</insert>
+	
+	<select id="deletepw" resultType="String" parameterType="finalWeb.command.ProcedureQACommand">
+	 select passwd from performReview where pdqNo = #{pdqNo}
+	</select>
+	
+	<delete id="delete" parameterType="finalWeb.command.ProcedureQACommand">
+		delete from performReview where pdqNo=#{pdqNo} 
+	</delete>
+	
+	
+	<update id="update" parameterType="finalWeb.command.ProcedureQACommand">
+	update performReview set writer = #{writer},pdqTitle = #{pdqTitle} , passwd = #{passwd} , pdqContent = #{pdqContent} , styleName = #{styleName}, pdqDate = sysdate where pdqNo = #{pdqNo}
+	</update>
+	
+	
+	<select id="getMax" resultType="String"  parameterType="finalWeb.command.ProcedureQACommand">
+	select max(pdqNo) from performReview
+	</select>
+	
+		<select id="getMax1" resultType="int"  parameterType="finalWeb.command.ProcedureQACommand">
+	select max(pdqNo) from performReview
+	</select>
+	
+	<update id="updateRef" parameterType="finalWeb.command.ProcedureQACommand">
+	update performReview set re_step=re_step+1 where ref=#{ref} and re_step&gt;#{re_step}
+	</update>
+	
+	<update id="pdqHits" parameterType="finalWeb.command.ProcedureQACommand">
+	update performReview set pdqHits=pdqHits+1 where pdqNo = #{pdqNo}
+	</update>
+</mapper>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Notice">
+	
+	<select id="getArticleCount" resultType="int">
+	 select count(*) from notice
+	</select>
+	
+	<select id="getArticles" resultType="finalWeb.command.NoticeCommand" parameterType="Map" >	
+            select noticeNo,writer,noticeTitle,passwd,noticeDate,ref,re_step,re_level,noticeContent,noticeHits,r   
+            from (select noticeNo,writer,noticeTitle,passwd,noticeDate,ref,re_step,re_level,noticeContent noticeContent,noticeHits noticeHits,rownum r  
+            from (select * from notice order by ref desc, re_step asc) order by ref desc, re_step asc ) where r &gt;= #{startRow} and r &lt;= #{endRow}
+	</select>
+	
+	<select id="searchgetArticleCount" resultType="int" parameterType="String">
+	 select count(*) from notice <where>
+	 <if test="searchN == 0">
+		writer 
+	 </if>	
+	  <if test="searchN == 1">
+		noticeTitle 
+	 </if>
+	  <if test="searchN == 2">
+		noticeContent 
+	 </if> 
+		 like '%' || #{searchKeyword} || '%'
+	 </where>
+	 	
+	</select>
+	
+	<select id="searchgetArticles" resultType="finalWeb.command.NoticeCommand" parameterType="Map" >
+
+	select
+	noticeNo,writer,noticeTitle,passwd,noticeDate,ref,re_step,re_level,noticeContent noticeContent,noticeHits noticeHits,r
+	from (select
+	noticeNo,writer,noticeTitle,passwd,noticeDate,ref,re_step,re_level,noticeContent noticeContent,noticeHits noticeHits,rownum r
+	from (select * from notice order by ref desc, re_step asc) 
+	<where> <if test="searchN == 0">
+		writer 
+	 </if>	
+	  <if test="searchN == 1">
+		noticeTitle 
+	 </if>
+	  <if test="searchN == 2">
+		noticeContent 
+	 </if> 
+	</where>
+	like '%' || #{searchKeyword} || '%'
+	order by ref desc, re_step asc ) where r &gt;= #{startRow} and r &lt;= #{endRow}
+	
+	</select>
+	
+	
+	<select id="getArticle" resultType="finalWeb.command.NoticeCommand" parameterType="int" >
+	select * from notice where noticeNo = #{noticeNo}
+	</select>
+	
+	
+	<insert id="insert" parameterType="finalWeb.command.NoticeCommand">
+		insert into notice(noticeNo,writer,noticeTitle,passwd,noticeDate,ref,re_step,re_level,noticeContent)
+		values(noticeseq.NEXTVAL,#{writer},#{noticeTitle},#{passwd},sysdate,#{ref},#{re_step},#{re_level},#{noticeContent})
+	</insert>
+	
+	<select id="deletepw" resultType="String" parameterType="finalWeb.command.NoticeCommand">
+	 select passwd from notice where noticeNo = #{noticeNo}
+	</select>
+	
+	<delete id="delete" parameterType="finalWeb.command.NoticeCommand">
+	delete from notice where noticeNo=#{noticeNo} 
+	</delete>
+	
+	
+	<update id="update" parameterType="finalWeb.command.NoticeCommand">
+	update notice set writer = #{writer},noticeTitle = #{noticeTitle} , passwd = #{passwd} , noticeContent = #{noticeContent}, noticeDate = sysdate where noticeNo = #{noticeNo}
+	</update>
+	
+	
+	<select id="getMax" resultType="String"  parameterType="finalWeb.command.NoticeCommand">
+	select max(noticeNo) from notice
+	</select>
+	
+		<select id="getMax1" resultType="int"  parameterType="finalWeb.command.NoticeCommand">
+	select max(noticeNo) from notice
+	</select>
+	
+	<update id="updateRef" parameterType="finalWeb.command.NoticeCommand">
+	update notice set re_step=re_step+1 where ref=#{ref} and re_step&gt;#{re_step}
+	</update>
+	
+	<update id="noticeHits" parameterType="finalWeb.command.NoticeCommand">
+	update notice set noticeHits=noticeHits+1 where noticeNo = #{noticeNo}
+	</update>
+</mapper>
